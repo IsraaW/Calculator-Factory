@@ -1,0 +1,42 @@
+/*
+Paste this method body into your existing Calculator class (method name must remain `compute`).
+Keep all your fields and other methods as-is.
+Ensure this class has access to OperationFactory (same `Calc` package).
+*/
+
+public void compute() {
+    if (this.currentOperand == null || this.currentOperand.isEmpty()) return;
+    if (this.previousOperand == null || this.previousOperand.isEmpty()) return;
+    if (this.operation == null || this.operation.isEmpty()) return;
+
+    double curr;
+    double prev;
+    try {
+        curr = Double.parseDouble(this.currentOperand);
+        prev = Double.parseDouble(this.previousOperand);
+    } catch (NumberFormatException ex) {
+        return;
+    }
+
+    if (("÷".equals(this.operation) || "/".equals(this.operation)) && curr == 0.0) {
+        this.clear();
+        this.currentOperand = "Error";
+        this.updateDisplay();
+        return;
+    }
+
+    Operation op = OperationFactory.of(this.operation);
+    if (op == null) return;
+
+    double result = op.apply(prev, curr);
+
+    if (result == Math.rint(result)) {
+        this.currentOperand = Long.toString((long) result);
+    } else {
+        this.currentOperand = Double.toString(result);
+    }
+
+    this.previousOperand = "";
+    this.operation = "";
+    this.updateDisplay();
+}

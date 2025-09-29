@@ -25,15 +25,15 @@ public final class Calculator extends javax.swing.JFrame {
 
     public void addEvents() {
         JButton[] btns = {
-            btn0, btn1, btn2, btn3, btn4,
-            btn5, btn6, btn7, btn8, btn9,
-            btnDiv, btnDot, btnEqual, btnDel,
-            btnMult, btnPlus, btnPlusSub, btnSub, btnClear
+                btn0, btn1, btn2, btn3, btn4,
+                btn5, btn6, btn7, btn8, btn9,
+                btnDiv, btnDot, btnEqual, btnDel,
+                btnMult, btnPlus, btnPlusSub, btnSub, btnClear
         };
 
         JButton[] numbers = {
-            btn0, btn1, btn2, btn3, btn4,
-            btn5, btn6, btn7, btn8, btn9
+                btn0, btn1, btn2, btn3, btn4,
+                btn5, btn6, btn7, btn8, btn9
         };
 
         for (JButton number : numbers) {
@@ -53,7 +53,8 @@ public final class Calculator extends javax.swing.JFrame {
                 @Override
                 public void mouseExited(MouseEvent e) {
                     Object b = e.getSource();
-                    if (b == btnDiv || b == btnEqual || b == btnDel || b == btnMult || b == btnSub || b == btnPlus || b == btnClear) {
+                    if (b == btnDiv || b == btnEqual || b == btnDel || b == btnMult || b == btnSub || b == btnPlus
+                            || b == btnClear) {
                         ((JButton) b).setBackground(new Color(41, 39, 44));
                     } else {
                         ((JButton) b).setBackground(new Color(21, 20, 22));
@@ -109,40 +110,44 @@ public final class Calculator extends javax.swing.JFrame {
     }
 
     public void compute() {
-        float computation;
-        if (this.currentOperand.equals("") || this.previousOperand.equals("")) {
+        if (this.currentOperand == null || this.currentOperand.isEmpty())
+            return;
+        if (this.previousOperand == null || this.previousOperand.isEmpty())
+            return;
+        if (this.operation == null || this.operation.isEmpty())
+            return;
+
+        double curr;
+        double prev;
+        try {
+            curr = Double.parseDouble(this.currentOperand);
+            prev = Double.parseDouble(this.previousOperand);
+        } catch (NumberFormatException ex) {
             return;
         }
 
-        float curr = Float.parseFloat(this.currentOperand);
-        float prev = Float.parseFloat(this.previousOperand);
-        if (Float.isNaN(curr) || Float.isNaN(prev)) {
+        if (("÷".equals(this.operation) || "/".equals(this.operation)) && curr == 0.0) {
+            this.clear();
+            this.currentOperand = "Error";
+            this.updateDisplay();
             return;
         }
 
-        switch (this.operation) {
-            case "+" ->
-                computation = prev + curr;
-            case "-" ->
-                computation = prev - curr;
-            case "×" ->
-                computation = prev * curr;
-            case "÷" -> {
-                if (curr == 0) {
-                    this.clear();
-                    this.currentOperand = "Error";
-                    return;
-                }
-                computation = prev / curr;
-            }
-            default -> {
-                return;
-            }
+        Operation op = OperationFactory.of(this.operation);
+        if (op == null)
+            return;
+
+        double result = op.apply(prev, curr);
+
+        if (result == Math.rint(result)) {
+            this.currentOperand = Long.toString((long) result);
+        } else {
+            this.currentOperand = Double.toString(result);
         }
 
-        this.currentOperand = (computation - (int) computation) != 0 ? Float.toString(computation) : Integer.toString((int) computation);
         this.previousOperand = "";
         this.operation = "";
+        this.updateDisplay();
     }
 
     public void updateDisplay() {
@@ -578,41 +583,41 @@ public final class Calculator extends javax.swing.JFrame {
 
     private void btnDotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDotActionPerformed
         appendNumber((this.currentOperand.isBlank() ? "0." : "."));
-    }//GEN-LAST:event_btnDotActionPerformed
+    }// GEN-LAST:event_btnDotActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
         clear();
-    }//GEN-LAST:event_btnClearActionPerformed
+    }// GEN-LAST:event_btnClearActionPerformed
 
     private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelActionPerformed
         if (!this.currentOperand.equals("")) {
             this.currentOperand = this.currentOperand.substring(0, this.currentOperand.length() - 1);
             this.updateDisplay();
         }
-    }//GEN-LAST:event_btnDelActionPerformed
+    }// GEN-LAST:event_btnDelActionPerformed
 
     private void btnPlusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPlusActionPerformed
         chooseOperation("+");
-    }//GEN-LAST:event_btnPlusActionPerformed
+    }// GEN-LAST:event_btnPlusActionPerformed
 
     private void btnMultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMultActionPerformed
         chooseOperation("×");
-    }//GEN-LAST:event_btnMultActionPerformed
+    }// GEN-LAST:event_btnMultActionPerformed
 
     private void btnSubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubActionPerformed
         chooseOperation("-");
-    }//GEN-LAST:event_btnSubActionPerformed
+    }// GEN-LAST:event_btnSubActionPerformed
 
     private void btnDivActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDivActionPerformed
         chooseOperation("÷");
-    }//GEN-LAST:event_btnDivActionPerformed
+    }// GEN-LAST:event_btnDivActionPerformed
 
     private void btnEqualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEqualActionPerformed
         this.compute();
         this.updateDisplay();
         if (this.currentOperand.equals("Error"))
             this.currentOperand = "";
-    }//GEN-LAST:event_btnEqualActionPerformed
+    }// GEN-LAST:event_btnEqualActionPerformed
 
     private void btnPlusSubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPlusSubActionPerformed
         if (!this.currentOperand.isBlank()) {
@@ -620,44 +625,44 @@ public final class Calculator extends javax.swing.JFrame {
             this.currentOperand = (tmp - (int) tmp) != 0 ? Float.toString(tmp) : Integer.toString((int) tmp);
             this.updateDisplay();
         }
-    }//GEN-LAST:event_btnPlusSubActionPerformed
+    }// GEN-LAST:event_btnPlusSubActionPerformed
 
     private void btnCloseMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCloseMouseEntered
         btnClose.setBackground(new Color(255, 75, 75));
         btnClose.setForeground(new Color(31, 30, 33));
-    }//GEN-LAST:event_btnCloseMouseEntered
+    }// GEN-LAST:event_btnCloseMouseEntered
 
     private void btnCloseMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCloseMouseExited
         btnClose.setBackground(new Color(21,20,22));
         btnClose.setForeground(Color.WHITE);
-    }//GEN-LAST:event_btnCloseMouseExited
+    }// GEN-LAST:event_btnCloseMouseExited
 
     private void btnMiniMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMiniMouseEntered
         btnMini.setBackground(new Color(73, 69, 78));
-    }//GEN-LAST:event_btnMiniMouseEntered
+    }// GEN-LAST:event_btnMiniMouseEntered
 
     private void btnMiniMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMiniMouseExited
         btnMini.setBackground(new Color(21,20,22));
-    }//GEN-LAST:event_btnMiniMouseExited
+    }// GEN-LAST:event_btnMiniMouseExited
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         System.exit(0);
-    }//GEN-LAST:event_btnCloseActionPerformed
+    }// GEN-LAST:event_btnCloseActionPerformed
 
     private void btnMiniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMiniActionPerformed
         setState(Calculator.ICONIFIED);
-    }//GEN-LAST:event_btnMiniActionPerformed
+    }// GEN-LAST:event_btnMiniActionPerformed
 
     private void titleBarMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_titleBarMousePressed
         x = evt.getX();
         y = evt.getY();
-    }//GEN-LAST:event_titleBarMousePressed
+    }// GEN-LAST:event_titleBarMousePressed
 
     private void titleBarMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_titleBarMouseDragged
         int xx = evt.getXOnScreen();
         int yy = evt.getYOnScreen();
         this.setLocation(xx - x, yy - y);
-    }//GEN-LAST:event_titleBarMouseDragged
+    }// GEN-LAST:event_titleBarMouseDragged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel app;
@@ -689,4 +694,5 @@ public final class Calculator extends javax.swing.JFrame {
     private javax.swing.JLabel title;
     private javax.swing.JPanel titleBar;
     // End of variables declaration//GEN-END:variables
+
 }
